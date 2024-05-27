@@ -1,5 +1,6 @@
 package com.example.gameclock.screens
 
+
 import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -7,25 +8,12 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Text
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,6 +24,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -46,17 +35,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.chargemap.compose.numberpicker.FullHours
 import com.chargemap.compose.numberpicker.Hours
 import com.chargemap.compose.numberpicker.HoursNumberPicker
 import com.example.gameclock.AlarmReceiver
 import com.example.gameclock.ViewModels.AlarmViewModel
+import com.example.gameclock.navigation.Screen
 import com.example.gameclock.widgets.SaveCancelBar
 import java.util.Calendar
 
@@ -98,8 +91,16 @@ fun SetAlarmScreen(
 
             Box(
                 modifier = Modifier
+
             ) {
-                DayPicker()
+                Column() {
+                    DayPicker()
+                    Spacer(modifier = Modifier.height(16.dp))
+                    if (alarmId != null) {
+                        AlarmTone(modifier = Modifier.padding(vertical = 20.dp), navController = navController, alarmId = alarmId)
+                    }
+                }
+
 
             }
         }
@@ -188,13 +189,23 @@ fun DayPicker() {
 }
 
 @Composable
-fun AlarmTone() {
+fun AlarmTone(modifier: Modifier = Modifier, navController: NavController, alarmId: String) {
     Row(
-        Modifier
+        modifier = modifier
             .fillMaxWidth()
-
+            .clickable { navController.navigate(Screen.RingtoneScreen.withId(alarmId)) }
+        ,
+        verticalAlignment = Alignment.CenterVertically
     ) {
+        Icon(painter = painterResource(id = com.example.gameclock.R.drawable.baseline_music_note_24), contentDescription = "Music Icon")
+        Column(
+            modifier = Modifier
+                .padding(start = 5.dp)
 
+        ) {
+            Text(text = "Ringtone", fontSize = 22.sp)
+            Text(text = "Ringtone name here")
+        }
     }
 }
 

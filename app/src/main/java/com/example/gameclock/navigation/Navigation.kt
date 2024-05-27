@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import com.example.gameclock.ViewModels.AlarmViewModel
 import com.example.gameclock.screens.AlarmDetailsScreen
 import com.example.gameclock.screens.HomeScreen
+import com.example.gameclock.screens.RingtoneSelectionScreen
 
 
 @Composable
@@ -34,7 +35,15 @@ fun Navigation() {
                 alarmViewModel = alarmViewModel
             )
         }
-
+        composable(
+            route = Screen.RingtoneScreen.route,
+            arguments = listOf(navArgument(name = DETAIL_ARGUMENT_KEY) {type = NavType.StringType})
+        ) {backStackEntry ->
+            RingtoneSelectionScreen(
+                navController = navController,
+                alarmId = backStackEntry.arguments?.getString(DETAIL_ARGUMENT_KEY),
+                alarmViewModel = alarmViewModel)
+        }
 
     }
 }

@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gameclock.ViewModels.AlarmViewModel
 import com.example.gameclock.navigation.Screen
+import com.example.gameclock.widgets.TopAppBar
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -80,14 +81,3 @@ fun AlarmsList() {
 
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopAppBar(title: String) {
-    CenterAlignedTopAppBar(
-        title = { Text(title) },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Black,
-            titleContentColor = Color.White
-        ),
-    )
-}

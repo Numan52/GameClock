@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,4 +63,20 @@ fun SaveCancelButton(text: String, onClick: () -> Unit) {
             textAlign = TextAlign.Center
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopAppBar(
+    title: String,
+    navigationIcons: @Composable () -> Unit = {},
+) {
+    CenterAlignedTopAppBar(
+        title = { Text(title) },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color.Black,
+            titleContentColor = Color.White
+        ),
+        navigationIcon = navigationIcons
+    )
 }
