@@ -23,20 +23,19 @@ import androidx.navigation.NavHostController
 import com.example.gameclock.navigation.Screen
 
 @Composable
-fun SaveCancelBar(navController: NavHostController) {
+fun SaveCancelBar(navController: NavHostController, onSaveClick: () -> Unit) {
     BottomAppBar(
         backgroundColor = Color(0xff0d0c0b),
         content = {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 50.dp, end = 50.dp)
-                ,
+                    .padding(start = 50.dp, end = 50.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 SaveCancelButton(text = "Cancel", onClick = { navController.navigate(Screen.HomeScreen.route) })
-                SaveCancelButton(text = "Save", onClick = { println("Cancel Button clicked") })
+                SaveCancelButton(text = "Save", onClick = onSaveClick)
             }
         }
     )
@@ -45,16 +44,13 @@ fun SaveCancelBar(navController: NavHostController) {
 @Composable
 fun SaveCancelButton(text: String, onClick: () -> Unit) {
     Button(
-
         colors = ButtonDefaults.buttonColors(
             backgroundColor = Color(0xff0d0c0b),
-
         ),
-
         onClick = {
             onClick()
-        })
-    {
+        }
+    ) {
         Text(
             text = text,
             fontSize = 20.sp,

@@ -1,43 +1,24 @@
 package com.example.gameclock.screens
 
-import android.annotation.SuppressLint
-import android.icu.lang.UCharacter.VerticalOrientation
+import android.content.Context
 import android.media.MediaPlayer
-import android.media.Ringtone
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.gameclock.R
 import com.example.gameclock.ViewModels.AlarmViewModel
-import com.example.gameclock.widgets.TopAppBar
-
+import com.example.gameclock.navigation.Screen
 
 val ringtoneList = listOf(
     "alarm1",
@@ -49,22 +30,18 @@ val ringtoneList = listOf(
     "samsung_ringtone",
 )
 
-
-
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "DiscouragedApi")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RingtoneSelectionScreen(
     navController: NavController,
     alarmId: String?,
-    alarmViewModel: AlarmViewModel) {
-
-    val (selectedRingtone, setSelectedRingtone) = remember{ mutableStateOf<String?>(null) }
+    alarmViewModel: AlarmViewModel = viewModel(),
+    context: Context
+) {
+    var selectedRingtone by remember { mutableStateOf<String?>(null) }
     var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
 
-    val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    LaunchedEffect(selectedRingtone) {
+    DisposableEffect(selectedRingtone) {
         mediaPlayer?.stop()
         mediaPlayer?.release()
         selectedRingtone?.let { ringtone ->
@@ -72,35 +49,46 @@ fun RingtoneSelectionScreen(
             mediaPlayer = MediaPlayer.create(context, resId)
             mediaPlayer?.start()
         }
-    }
-
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_STOP) {
-                mediaPlayer?.stop()
-                mediaPlayer?.release()
-                mediaPlayer = null
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
             mediaPlayer?.stop()
             mediaPlayer?.release()
             mediaPlayer = null
         }
     }
 
-
     Scaffold(
         topBar = {
-            TopAppBar(title = "Ringtone", navigationIcons = {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowLeft,
-                        contentDescription = "Back Button")
+            SmallTopAppBar(
+                title = { Text("Ringtone") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(imageVector = Icons.Default.KeyboardArrowLeft, contentDescription = "Back Button")
+                    }
                 }
-            })
+            )
+        },
+        bottomBar = {
+            BottomAppBar(
+                content = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Button(
+                            onClick = {
+                                selectedRingtone?.let { alarmViewModel.setSelectedRingtone(it) }
+                                navController.popBackStack()
+                            },
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        ) {
+                            Text(text = "Select", fontSize = 16.sp)
+                        }
+                    }
+                }
+            )
         }
     ) { innerPadding ->
         LazyColumn(
@@ -111,37 +99,35 @@ fun RingtoneSelectionScreen(
                 RingtoneItem(
                     ringtone = ringtone,
                     selectedRingtone = selectedRingtone,
-                    onRingtoneSelected = { setSelectedRingtone(ringtone) }
-
+                    onRingtoneSelected = { selectedRingtone = it }
                 )
-
             }
         }
     }
-
 }
 
 @Composable
 fun RingtoneItem(
     ringtone: String,
     selectedRingtone: String?,
-    onRingtoneSelected: (String) -> Unit) {
+    onRingtoneSelected: (String) -> Unit
+) {
     Row(
-
         modifier = Modifier
-
-            .clickable { onRingtoneSelected(ringtone) },
+            .clickable { onRingtoneSelected(ringtone) }
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         RadioButton(
             selected = ringtone == selectedRingtone,
-            onClick = { onRingtoneSelected(ringtone) })
+            onClick = { onRingtoneSelected(ringtone) }
+        )
         Text(
             text = ringtone,
-            modifier = Modifier.clickable { onRingtoneSelected(ringtone) },
             fontSize = 20.sp,
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .clickable { onRingtoneSelected(ringtone) }
         )
     }
 }
-
-

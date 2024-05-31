@@ -6,7 +6,7 @@ data class Alarm(
     val id: String,
     val hour: Int,
     val minute: Int,
-    val date: LocalDate
-) {
-
-}
+    val date: LocalDate,
+    val ringtone: String,
+    val puzzle: String
+)
