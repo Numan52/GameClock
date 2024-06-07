@@ -26,6 +26,10 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
     private val _selectedDate = MutableStateFlow(LocalDate.now())
     val selectedDate : MutableStateFlow<LocalDate> get() = _selectedDate
 
+    private val _selectedDays = MutableStateFlow((setOf<String>()))
+    val selectedDays : StateFlow<Set<String>> get() = _selectedDays
+
+
     fun setHour(hour: Int) {
         _selectedHour.value = hour
     }
@@ -40,6 +44,14 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setRingtone(ringtone: String) {
         _selectedRingtone.value = ringtone
+    }
+
+    fun addDay(day: String) {
+        _selectedDays.value += day
+    }
+
+    fun removeDay(day: String) {
+        _selectedDays.value -= day
     }
 
     init {

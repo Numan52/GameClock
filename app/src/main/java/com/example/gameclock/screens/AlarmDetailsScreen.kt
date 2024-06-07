@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.DatePicker
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,6 +39,7 @@ import com.example.gameclock.models.Alarm
 import com.example.gameclock.navigation.Screen
 import com.example.gameclock.widgets.SaveCancelBar
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Composable
@@ -60,17 +63,48 @@ fun SetAlarmScreen(
     val selectedHour by alarmViewModel.selectedHour.collectAsState()
     val selectedMinute by alarmViewModel.selectedMinute.collectAsState()
     val selectedDate by alarmViewModel.selectedDate.collectAsState()
+    val selectedDays by alarmViewModel.selectedDays.collectAsState()
     val selectedRingtone by alarmViewModel.selectedRingtone.collectAsState()
     var selectedPuzzle by remember { mutableStateOf("simplePuzzle") }
 
+    var selectedTimeInfo by rememberSaveable { mutableStateOf("") }
+
+    val daysOfWeekOrder = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+
+    if (selectedDays.isNotEmpty()) {
+        if (selectedDays.size == 7) {
+            selectedTimeInfo = "Daily"
+        } else {
+            val stringBuilder = StringBuilder("Every ")
+            val sortedDays = selectedDays.sortedBy { daysOfWeekOrder.indexOf(it) }
+            for (day in sortedDays) {
+                stringBuilder.append(day).append(",")
+            }
+            selectedTimeInfo = stringBuilder.toString().removeSuffix(",")
+        }
+    } else {
+        val dateFormatter = DateTimeFormatter.ofPattern("EEE, MMMM d, yyyy", Locale.getDefault())
+        val formattedDate = selectedDate.format(dateFormatter)
+        selectedTimeInfo = formattedDate
+    }
+
+    val currentDateTime = remember { Calendar.getInstance() }
+    val selectedDateTime = Calendar.getInstance().apply {
+        set(selectedDate.year, selectedDate.monthValue - 1, selectedDate.dayOfMonth, selectedHour, selectedMinute)
+    }
+    val isDateTimeInFuture = selectedDateTime.after(currentDateTime)
 
     Scaffold(
         bottomBar = {
             SaveCancelBar(navController = navController, onSaveClick = {
-                val alarm = Alarm(alarmId ?: UUID.randomUUID().toString(), selectedHour, selectedMinute, selectedDate, selectedRingtone ?: "alarm1", selectedPuzzle)
-                alarmViewModel.addAlarm(alarm)
-                setAlarm(context, alarm)
-                navController.navigate(Screen.HomeScreen.route)
+                if (isDateTimeInFuture) {
+                    val alarm = Alarm(alarmId ?: UUID.randomUUID().toString(), selectedHour, selectedMinute, selectedDate, selectedRingtone ?: "alarm1", selectedPuzzle)
+                    alarmViewModel.addAlarm(alarm)
+                    setAlarm(context, alarm)
+                    navController.navigate(Screen.HomeScreen.route)
+                } else {
+                    Toast.makeText(context, "You can't select a time in the past", Toast.LENGTH_LONG).show()
+                }
             })
         }
     ) { paddingValues ->
@@ -98,14 +132,14 @@ fun SetAlarmScreen(
 
 
             ) {
-                Text(text = selectedDate.toString())
+                Text(text = selectedTimeInfo, fontSize = 18.sp)
                 DatePicker(onDateSelected = { date ->
                     alarmViewModel.setDate(date)
                 })
             }
 
 
-            DayPicker()
+            DayPicker(alarmViewModel = alarmViewModel)
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -201,9 +235,9 @@ fun AlarmTone(
 
 // for recurrent alarms (eg. When Mon is selected, alarm will ring every monday)
 @Composable
-fun DayPicker() {
+fun DayPicker(alarmViewModel: AlarmViewModel) {
     val daysOfWeek = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-    val selectedDays = remember { mutableStateOf(setOf<String>()) }
+    val selectedDays by alarmViewModel.selectedDays.collectAsState()
 
     Row(
         modifier = Modifier
@@ -212,7 +246,7 @@ fun DayPicker() {
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         daysOfWeek.forEach { day ->
-            val isSelected = selectedDays.value.contains(day)
+            val isSelected = selectedDays.contains(day)
             Box(
                 modifier = Modifier
                     .height(30.dp)
@@ -227,9 +261,9 @@ fun DayPicker() {
                     )
                     .clickable {
                         if (isSelected) {
-                            selectedDays.value -= day
+                            alarmViewModel.removeDay(day)
                         } else {
-                            selectedDays.value += day
+                            alarmViewModel.addDay(day)
                         }
                     },
                 contentAlignment = Alignment.Center
