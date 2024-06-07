@@ -1,11 +1,8 @@
 package com.example.gameclock.screens
 
 import android.annotation.SuppressLint
-import android.app.AlarmManager
 import android.app.DatePickerDialog
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.util.Log
 import android.widget.DatePicker
 import android.widget.Toast
@@ -33,8 +30,8 @@ import androidx.navigation.NavHostController
 import com.chargemap.compose.numberpicker.FullHours
 import com.chargemap.compose.numberpicker.Hours
 import com.chargemap.compose.numberpicker.HoursNumberPicker
-import com.example.gameclock.AlarmReceiver
 import com.example.gameclock.ViewModels.AlarmViewModel
+import com.example.gameclock.helper.AlarmManagerHelper
 import com.example.gameclock.models.Alarm
 import com.example.gameclock.navigation.Screen
 import com.example.gameclock.widgets.SaveCancelBar
@@ -47,9 +44,10 @@ fun AlarmDetailsScreen(
     navController: NavHostController,
     alarmId: String?,
     alarmViewModel: AlarmViewModel,
-    context: Context
+    context: Context,
+    alarmManagerHelper: AlarmManagerHelper
 ) {
-    SetAlarmScreen(navController = navController, alarmId = alarmId, alarmViewModel = alarmViewModel, context = context)
+    SetAlarmScreen(navController = navController, alarmId = alarmId, alarmViewModel = alarmViewModel, context = context, alarmManagerHelper = alarmManagerHelper)
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -58,8 +56,10 @@ fun SetAlarmScreen(
     navController: NavHostController,
     alarmId: String?,
     alarmViewModel: AlarmViewModel,
-    context: Context
+    context: Context,
+    alarmManagerHelper: AlarmManagerHelper
 ) {
+
     val selectedHour by alarmViewModel.selectedHour.collectAsState()
     val selectedMinute by alarmViewModel.selectedMinute.collectAsState()
     val selectedDate by alarmViewModel.selectedDate.collectAsState()
@@ -97,10 +97,18 @@ fun SetAlarmScreen(
     Scaffold(
         bottomBar = {
             SaveCancelBar(navController = navController, onSaveClick = {
-                if (isDateTimeInFuture) {
-                    val alarm = Alarm(alarmId ?: UUID.randomUUID().toString(), selectedHour, selectedMinute, selectedDate, selectedRingtone ?: "alarm1", selectedPuzzle)
+                if (isDateTimeInFuture || selectedDays.isNotEmpty()) {
+                    val alarm = Alarm(
+                        id = alarmId ?: UUID.randomUUID().toString(),
+                        hour = selectedHour,
+                        minute = selectedMinute,
+                        date = if (selectedDays.isEmpty()) selectedDate else null,
+                        recurringDays = selectedDays,
+                        ringtone = selectedRingtone ?: "alarm1",
+                        puzzle = selectedPuzzle
+                    )
                     alarmViewModel.addAlarm(alarm)
-                    setAlarm(context, alarm)
+                    alarmManagerHelper.setAlarm(alarm)
                     navController.navigate(Screen.HomeScreen.route)
                 } else {
                     Toast.makeText(context, "You can't select a time in the past", Toast.LENGTH_LONG).show()
@@ -129,15 +137,12 @@ fun SetAlarmScreen(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
-
-
             ) {
                 Text(text = selectedTimeInfo, fontSize = 18.sp)
                 DatePicker(onDateSelected = { date ->
                     alarmViewModel.setDate(date)
                 })
             }
-
 
             DayPicker(alarmViewModel = alarmViewModel)
 
@@ -278,26 +283,3 @@ fun DayPicker(alarmViewModel: AlarmViewModel) {
     }
 }
 
-
-@SuppressLint("ScheduleExactAlarm")
-fun setAlarm(context: Context, alarm: Alarm) {
-    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    val intent = Intent(context, AlarmReceiver::class.java).apply {
-        putExtra("alarmId", alarm.id)
-        putExtra("ringtone", alarm.ringtone) // Pass the selected ringtone
-    }
-    val pendingIntent = PendingIntent.getBroadcast(context, alarm.id.hashCode(), intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-
-    val calendar = Calendar.getInstance().apply {
-        set(alarm.date.year, alarm.date.monthValue - 1, alarm.date.dayOfMonth, alarm.hour, alarm.minute, 0)
-    }
-
-    alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
-}
-
-fun cancelAlarm(context: Context, alarm: Alarm) {
-    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    val intent = Intent(context, AlarmReceiver::class.java)
-    val pendingIntent = PendingIntent.getBroadcast(context, alarm.id.hashCode(), intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-    alarmManager.cancel(pendingIntent)
-}

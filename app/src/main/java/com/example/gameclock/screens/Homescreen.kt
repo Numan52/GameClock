@@ -15,13 +15,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gameclock.ViewModels.AlarmViewModel
+import com.example.gameclock.helper.AlarmManagerHelper
 import com.example.gameclock.models.Alarm
 import com.example.gameclock.navigation.Screen
 import com.example.gameclock.widgets.TopAppBar
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomeScreen(navController: NavHostController, alarmViewModel: AlarmViewModel) {
+fun HomeScreen(
+    navController: NavHostController,
+    alarmViewModel: AlarmViewModel,
+    alarmManagerHelper: AlarmManagerHelper
+) {
     val alarms = alarmViewModel.alarms.collectAsState()
 
     Scaffold(
@@ -42,7 +47,7 @@ fun HomeScreen(navController: NavHostController, alarmViewModel: AlarmViewModel)
                     Text(text = "You don't have any alarms", fontSize = 32.sp)
                 }
             } else {
-                AlarmsList(navController = navController, alarms = alarms.value, alarmViewModel = alarmViewModel)
+                AlarmsList(navController = navController, alarms = alarms.value, alarmViewModel = alarmViewModel, alarmManagerHelper = alarmManagerHelper)
             }
             Row(
                 modifier = Modifier
@@ -67,16 +72,16 @@ fun HomeScreen(navController: NavHostController, alarmViewModel: AlarmViewModel)
 }
 
 @Composable
-fun AlarmsList(navController: NavHostController, alarms: List<Alarm>, alarmViewModel: AlarmViewModel) {
+fun AlarmsList(navController: NavHostController, alarms: List<Alarm>, alarmViewModel: AlarmViewModel, alarmManagerHelper: AlarmManagerHelper) {
     Column {
         alarms.forEach { alarm ->
-            AlarmItem(navController = navController, alarm = alarm, alarmViewModel = alarmViewModel)
+            AlarmItem(navController = navController, alarm = alarm, alarmViewModel = alarmViewModel, alarmManagerHelper = alarmManagerHelper)
         }
     }
 }
 
 @Composable
-fun AlarmItem(navController: NavHostController, alarm: Alarm, alarmViewModel: AlarmViewModel) {
+fun AlarmItem(navController: NavHostController, alarm: Alarm, alarmViewModel: AlarmViewModel, alarmManagerHelper: AlarmManagerHelper) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -89,11 +94,21 @@ fun AlarmItem(navController: NavHostController, alarm: Alarm, alarmViewModel: Al
     ) {
         Column {
             Text(text = "${alarm.hour}:${alarm.minute}", fontSize = 24.sp)
-            Text(text = alarm.date.toString(), fontSize = 18.sp)
+            if (alarm.date != null) {
+                Text(text = alarm.date.toString(), fontSize = 18.sp)
+            } else if (alarm.recurringDays.isNotEmpty()) {
+                var days = ""
+                if (alarm.recurringDays.size == 7) {
+                    days = "Daily"
+                } else {
+                    days = "Every " + alarm.recurringDays.joinToString(", ")
+                }
+                Text(text = days, fontSize = 18.sp)
+            }
         }
         IconButton(onClick = {
             alarmViewModel.removeAlarm(alarm)
-            cancelAlarm(navController.context, alarm)
+            alarmManagerHelper.cancelAlarm(alarm, setOf())
         }) {
             Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Alarm")
         }
