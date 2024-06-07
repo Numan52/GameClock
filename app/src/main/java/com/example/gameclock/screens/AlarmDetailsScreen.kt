@@ -6,19 +6,26 @@ import android.app.DatePickerDialog
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.DatePicker
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.chargemap.compose.numberpicker.FullHours
@@ -50,11 +57,12 @@ fun SetAlarmScreen(
     alarmViewModel: AlarmViewModel,
     context: Context
 ) {
-    var selectedHour by remember { mutableStateOf(12) }
-    var selectedMinute by remember { mutableStateOf(30) }
-    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+    val selectedHour by alarmViewModel.selectedHour.collectAsState()
+    val selectedMinute by alarmViewModel.selectedMinute.collectAsState()
+    val selectedDate by alarmViewModel.selectedDate.collectAsState()
     val selectedRingtone by alarmViewModel.selectedRingtone.collectAsState()
     var selectedPuzzle by remember { mutableStateOf("simplePuzzle") }
+
 
     Scaffold(
         bottomBar = {
@@ -75,22 +83,36 @@ fun SetAlarmScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            TimePicker(onTimeSelected = { hour, minute ->
-                selectedHour = hour
-                selectedMinute = minute
+            TimePicker(alarmViewModel = alarmViewModel, onTimeSelected = { hour, minute ->
+                alarmViewModel.setHour(hour)
+                alarmViewModel.setMinute(minute)
+                Log.i("hour and minute", alarmViewModel.selectedHour.value.toString() + ", " + alarmViewModel.selectedMinute.value)
             })
 
             Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
 
-            DatePicker(onDateSelected = { date ->
-                selectedDate = date
-            })
+
+            ) {
+                Text(text = selectedDate.toString())
+                DatePicker(onDateSelected = { date ->
+                    alarmViewModel.setDate(date)
+                })
+            }
+
+
+            DayPicker()
 
             Spacer(modifier = Modifier.height(16.dp))
 
             AlarmTone(
                 modifier = Modifier.padding(vertical = 20.dp),
                 navController = navController,
+                alarmViewModel = alarmViewModel,
                 alarmId = alarmId ?: UUID.randomUUID().toString()
             )
         }
@@ -98,8 +120,9 @@ fun SetAlarmScreen(
 }
 
 @Composable
-fun TimePicker(onTimeSelected: (hour: Int, minute: Int) -> Unit) {
-    var pickerValue by remember { mutableStateOf<Hours>(FullHours(12, 30)) }
+fun TimePicker(onTimeSelected: (hour: Int, minute: Int) -> Unit, alarmViewModel: AlarmViewModel) {
+    var pickerValue by remember { mutableStateOf<Hours>(FullHours(alarmViewModel.selectedHour.value, alarmViewModel.selectedMinute.value )) }
+
     HoursNumberPicker(
         dividersColor = MaterialTheme.colorScheme.primary,
         leadingZero = false,
@@ -139,18 +162,21 @@ fun DatePicker(onDateSelected: (date: LocalDate) -> Unit) {
             .clickable { datePickerDialog.show() }
             .padding(16.dp)
     ) {
-        Text(text = "Selected Date: ${selectedDate.toString()}")
+        Icon(imageVector = Icons.Default.DateRange, contentDescription = "Date icon")
+//        Text(text = "Selected Date: ${selectedDate.toString()}")
     }
 }
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun AlarmTone(
     modifier: Modifier = Modifier,
     navController: NavController,
-    alarmId: String
+    alarmId: String,
+    alarmViewModel: AlarmViewModel
 ) {
     val context = LocalContext.current
-    val alarmViewModel = viewModel<AlarmViewModel>()
+    val selectedRingtone by alarmViewModel.selectedRingtone.collectAsState()
 
     Row(
         modifier = modifier
@@ -164,10 +190,60 @@ fun AlarmTone(
                 .padding(start = 5.dp)
         ) {
             Text(text = "Ringtone", fontSize = 22.sp)
-            Text(text = alarmViewModel.selectedRingtone.collectAsState().value ?: "Select Ringtone")
+            Log.i("SelectedRingtone",
+                alarmViewModel.selectedRingtone.value.toString()
+            )
+            Text(text = selectedRingtone ?: "Select Ringtone")
         }
     }
 }
+
+
+// for recurrent alarms (eg. When Mon is selected, alarm will ring every monday)
+@Composable
+fun DayPicker() {
+    val daysOfWeek = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+    val selectedDays = remember { mutableStateOf(setOf<String>()) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 20.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        daysOfWeek.forEach { day ->
+            val isSelected = selectedDays.value.contains(day)
+            Box(
+                modifier = Modifier
+                    .height(30.dp)
+                    .width(50.dp)
+                    .background(Color.Transparent)
+                    .border(
+                        BorderStroke(
+                            2.dp,
+                            if (isSelected) Color.Blue else Color.Transparent
+                        ),
+                        shape = RoundedCornerShape(5)
+                    )
+                    .clickable {
+                        if (isSelected) {
+                            selectedDays.value -= day
+                        } else {
+                            selectedDays.value += day
+                        }
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = day,
+                    fontSize = 18.sp,
+                    color = if (isSelected) Color.Blue else Color.Black // Optional text color change
+                )
+            }
+        }
+    }
+}
+
 
 @SuppressLint("ScheduleExactAlarm")
 fun setAlarm(context: Context, alarm: Alarm) {

@@ -1,7 +1,9 @@
 package com.example.gameclock.screens
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.media.MediaPlayer
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,6 +32,7 @@ val ringtoneList = listOf(
     "samsung_ringtone",
 )
 
+@SuppressLint("DiscouragedApi")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RingtoneSelectionScreen(
@@ -38,7 +41,8 @@ fun RingtoneSelectionScreen(
     alarmViewModel: AlarmViewModel = viewModel(),
     context: Context
 ) {
-    var selectedRingtone by remember { mutableStateOf<String?>(null) }
+
+    val selectedRingtone by alarmViewModel.selectedRingtone.collectAsState()
     var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
 
     DisposableEffect(selectedRingtone) {
@@ -80,6 +84,9 @@ fun RingtoneSelectionScreen(
                         Button(
                             onClick = {
                                 selectedRingtone?.let { alarmViewModel.setSelectedRingtone(it) }
+                                Log.i("SelectedRingtone",
+                                    alarmViewModel.selectedRingtone.value.toString()
+                                )
                                 navController.popBackStack()
                             },
                             modifier = Modifier.padding(horizontal = 16.dp)
@@ -99,7 +106,7 @@ fun RingtoneSelectionScreen(
                 RingtoneItem(
                     ringtone = ringtone,
                     selectedRingtone = selectedRingtone,
-                    onRingtoneSelected = { selectedRingtone = it }
+                    onRingtoneSelected = { alarmViewModel.setRingtone(ringtone) }
                 )
             }
         }

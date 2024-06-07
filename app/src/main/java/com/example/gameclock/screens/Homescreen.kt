@@ -80,9 +80,9 @@ fun AlarmItem(navController: NavHostController, alarm: Alarm, alarmViewModel: Al
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                navController.navigate(route = Screen.AlarmDetailsScreen.withId(alarm.id))
-            }
+//            .clickable {
+//                navController.navigate(route = Screen.AlarmDetailsScreen.withId(alarm.id))
+//            }
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
