@@ -54,6 +54,10 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
         _selectedDays.value -= day
     }
 
+    fun resetSelectedDays() {
+        _selectedDays.value = emptySet()
+    }
+
     init {
         _alarms.value = repository.loadAlarms()
     }
