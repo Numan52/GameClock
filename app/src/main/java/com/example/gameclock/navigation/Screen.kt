@@ -13,5 +13,12 @@ sealed class Screen(val route: String) {
             return this.route.replace(oldValue = "{$DETAIL_ARGUMENT_KEY}", newValue = id)
         }
     }
+
+    object PuzzleSelectionScreen : Screen("puzzleSelection/{$DETAIL_ARGUMENT_KEY}") {
+        fun withId(id: String): String {
+            return this.route.replace(oldValue = "{$DETAIL_ARGUMENT_KEY}", newValue = id)
+        }
+    }
+
     object PuzzleScreen : Screen("puzzle")
 }

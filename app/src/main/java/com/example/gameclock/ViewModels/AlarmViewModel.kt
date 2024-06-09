@@ -29,6 +29,8 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
     private val _selectedDays = MutableStateFlow((setOf<String>()))
     val selectedDays : StateFlow<Set<String>> get() = _selectedDays
 
+    private val _selectedPuzzleId = MutableStateFlow(1)
+    val selectedPuzzleId : StateFlow<Int?> = _selectedPuzzleId
 
     fun setHour(hour: Int) {
         _selectedHour.value = hour
@@ -56,6 +58,10 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
 
     fun resetSelectedDays() {
         _selectedDays.value = emptySet()
+    }
+
+    fun setPuzzleId(puzzleId: Int) {
+        _selectedPuzzleId.value = puzzleId
     }
 
     init {

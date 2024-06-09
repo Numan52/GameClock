@@ -20,6 +20,7 @@ import androidx.navigation.NavHostController
 import com.example.gameclock.ViewModels.AlarmViewModel
 import com.example.gameclock.helper.AlarmManagerHelper
 import com.example.gameclock.models.Alarm
+import com.example.gameclock.models.getPuzzleOptions
 import com.example.gameclock.navigation.Screen
 import com.example.gameclock.widgets.DatePicker
 import com.example.gameclock.widgets.DayPicker
@@ -144,6 +145,14 @@ fun SetAlarmScreen(
                 alarmViewModel = alarmViewModel,
                 alarmId = alarmId ?: UUID.randomUUID().toString()
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            PuzzleSelection(
+                alarmViewModel = alarmViewModel,
+                alarmId = alarmId ?: UUID.randomUUID().toString(),
+                navController = navController
+            )
         }
     }
 }
@@ -171,13 +180,35 @@ fun AlarmTone(
         Icon(painter = painterResource(id = com.example.gameclock.R.drawable.baseline_music_note_24), contentDescription = "Music Icon")
         Column(
             modifier = Modifier
-                .padding(start = 5.dp)
+                .padding(start = 10.dp)
         ) {
             Text(text = "Ringtone", fontSize = 22.sp)
             Log.i("SelectedRingtone",
                 alarmViewModel.selectedRingtone.value.toString()
             )
             Text(text = selectedRingtone ?: "Select Ringtone")
+        }
+    }
+}
+
+
+@Composable
+fun PuzzleSelection(alarmViewModel: AlarmViewModel, alarmId: String, navController: NavController) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { navController.navigate(Screen.PuzzleSelectionScreen.withId(alarmId)) },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(painter = painterResource(id = com.example.gameclock.R.drawable.puzzle_piece), contentDescription = "Puzzle Icon")
+        Column(
+            modifier = Modifier
+                .padding(start = 10.dp)
+        ) {
+            Text(text = "Puzzle", fontSize = 22.sp)
+            Text(text = getPuzzleOptions().find { puzzle -> alarmViewModel.selectedPuzzleId.value == puzzle.id }?.name
+                ?: "Select Puzzle")
+//            Text(text = selectedRingtone ?: "Select Ringtone")
         }
     }
 }
