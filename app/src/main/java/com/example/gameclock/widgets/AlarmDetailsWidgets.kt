@@ -119,7 +119,7 @@ fun TimePicker(onTimeSelected: (hour: Int, minute: Int) -> Unit, alarmViewModel:
 
     HoursNumberPicker(
         dividersColor = MaterialTheme.colorScheme.primary,
-        leadingZero = false,
+        leadingZero = true,
         value = pickerValue,
         onValueChange = {
             pickerValue = it

@@ -93,7 +93,10 @@ fun AlarmItem(navController: NavHostController, alarm: Alarm, alarmViewModel: Al
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column {
-            Text(text = "${alarm.hour}:${alarm.minute}", fontSize = 24.sp)
+            val formattedHour = if (alarm.hour < 10) "0${alarm.hour}" else "${alarm.hour}"
+            val formattedMinute = if (alarm.minute < 10) "0${alarm.minute}" else "${alarm.minute}"
+
+            Text(text = "${formattedHour}:${formattedMinute}", fontSize = 24.sp)
             if (alarm.date != null) {
                 Text(text = alarm.date.toString(), fontSize = 18.sp)
             } else if (alarm.recurringDays.isNotEmpty()) {
