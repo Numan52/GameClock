@@ -20,7 +20,8 @@ import androidx.navigation.NavHostController
 import com.example.gameclock.ViewModels.AlarmViewModel
 import com.example.gameclock.helper.AlarmManagerHelper
 import com.example.gameclock.models.Alarm
-import com.example.gameclock.models.getPuzzleOptions
+import com.example.gameclock.models.JigsawPuzzle
+import com.example.gameclock.models.Puzzle
 import com.example.gameclock.navigation.Screen
 import com.example.gameclock.widgets.DatePicker
 import com.example.gameclock.widgets.DayPicker
@@ -55,7 +56,7 @@ fun SetAlarmScreen(
     val selectedDate by alarmViewModel.selectedDate.collectAsState()
     val selectedDays by alarmViewModel.selectedDays.collectAsState()
     val selectedRingtone by alarmViewModel.selectedRingtone.collectAsState()
-    var selectedPuzzle by remember { mutableStateOf("simplePuzzle") }
+    val selectedPuzzle by alarmViewModel.selectedPuzzle.collectAsState()
 
     var selectedTimeInfo by rememberSaveable { mutableStateOf("") }
 
@@ -88,6 +89,7 @@ fun SetAlarmScreen(
         bottomBar = {
             SaveCancelBar(navController = navController, onSaveClick = {
                 if (isDateTimeInFuture || selectedDays.isNotEmpty()) {
+                    Log.i("selected-puzzle", selectedPuzzle?.puzzleType.toString() )
                     val alarm = Alarm(
                         id = alarmId ?: UUID.randomUUID().toString(),
                         hour = selectedHour,
@@ -95,8 +97,9 @@ fun SetAlarmScreen(
                         date = if (selectedDays.isEmpty()) selectedDate else null,
                         recurringDays = selectedDays,
                         ringtone = selectedRingtone ?: "alarm1",
-                        puzzle = selectedPuzzle
+                        puzzle = selectedPuzzle ?: JigsawPuzzle() // TODO: why is puzzle null after saving??
                     )
+                    Log.i("my-alarm", alarm.toString())
                     alarmViewModel.addAlarm(alarm)
                     alarmManagerHelper.setAlarm(alarm)
                     navController.navigate(Screen.HomeScreen.route)
@@ -148,11 +151,14 @@ fun SetAlarmScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            PuzzleSelection(
-                alarmViewModel = alarmViewModel,
-                alarmId = alarmId ?: UUID.randomUUID().toString(),
-                navController = navController
-            )
+            selectedPuzzle?.let {
+                PuzzleSelection(
+                    alarmViewModel = alarmViewModel,
+                    alarmId = alarmId ?: UUID.randomUUID().toString(),
+                    selectedPuzzle = it,
+                    navController = navController
+                )
+            }
         }
     }
 }
@@ -193,7 +199,12 @@ fun AlarmTone(
 
 
 @Composable
-fun PuzzleSelection(alarmViewModel: AlarmViewModel, alarmId: String, navController: NavController) {
+fun PuzzleSelection(
+    alarmViewModel: AlarmViewModel,
+    alarmId: String,
+    navController: NavController,
+    selectedPuzzle: Puzzle
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -206,8 +217,7 @@ fun PuzzleSelection(alarmViewModel: AlarmViewModel, alarmId: String, navControll
                 .padding(start = 10.dp)
         ) {
             Text(text = "Puzzle", fontSize = 22.sp)
-            Text(text = getPuzzleOptions().find { puzzle -> alarmViewModel.selectedPuzzleId.value == puzzle.id }?.name
-                ?: "Select Puzzle")
+            Text(text =  selectedPuzzle.name)
 //            Text(text = selectedRingtone ?: "Select Ringtone")
         }
     }

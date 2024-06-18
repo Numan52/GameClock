@@ -9,5 +9,5 @@ data class Alarm(
     val date: LocalDate?,
     val recurringDays: Set<String> = emptySet(),
     val ringtone: String,
-    val puzzle: String
+    val puzzle: Puzzle
 )

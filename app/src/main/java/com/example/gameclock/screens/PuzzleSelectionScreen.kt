@@ -54,8 +54,7 @@ fun PuzzleSelectionScreen(
 ) {
     val puzzleOptions = getPuzzleOptions()
 
-    val selectedPuzzleId by alarmViewModel.selectedPuzzleId.collectAsState()
-    val selectedPuzzle = getPuzzleOptions().find { it.id == selectedPuzzleId }
+    val selectedPuzzle by alarmViewModel.selectedPuzzle.collectAsState()
 
     Scaffold(
         topBar = {
@@ -98,8 +97,8 @@ fun PuzzleSelectionScreen(
             items(puzzleOptions) { puzzle ->
                 PuzzleItem(
                     puzzle = puzzle,
-                    selectedPuzzleId = selectedPuzzleId,
-                    onPuzzleSelection = { puzzleId -> alarmViewModel.setPuzzleId(puzzleId) }
+                    selectedPuzzleId = selectedPuzzle?.id,
+                    onPuzzleSelection = { alarmViewModel.setPuzzle(puzzle) }
                 )
             }
         }

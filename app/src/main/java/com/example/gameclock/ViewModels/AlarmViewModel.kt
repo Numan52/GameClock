@@ -1,9 +1,12 @@
 package com.example.gameclock.ViewModels
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import com.example.gameclock.Repository.AlarmRepository
 import com.example.gameclock.models.Alarm
+import com.example.gameclock.models.JigsawPuzzle
+import com.example.gameclock.models.Puzzle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDate
@@ -29,8 +32,13 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
     private val _selectedDays = MutableStateFlow((setOf<String>()))
     val selectedDays : StateFlow<Set<String>> get() = _selectedDays
 
-    private val _selectedPuzzleId = MutableStateFlow(1)
-    val selectedPuzzleId : StateFlow<Int?> = _selectedPuzzleId
+    private val _selectedPuzzle: MutableStateFlow<Puzzle> = MutableStateFlow(JigsawPuzzle())
+    val selectedPuzzle : StateFlow<Puzzle?> get() = _selectedPuzzle
+
+
+    init {
+        _alarms.value = repository.loadAlarms()
+    }
 
     fun setHour(hour: Int) {
         _selectedHour.value = hour
@@ -60,16 +68,16 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
         _selectedDays.value = emptySet()
     }
 
-    fun setPuzzleId(puzzleId: Int) {
-        _selectedPuzzleId.value = puzzleId
+    fun setPuzzle(puzzle: Puzzle) {
+        _selectedPuzzle.value = puzzle
     }
 
-    init {
-        _alarms.value = repository.loadAlarms()
-    }
+
 
     fun addAlarm(alarm: Alarm) {
+        Log.i("addAlarm", alarm.toString())
         _alarms.value = _alarms.value + alarm
+        Log.i("addAlarm", alarms.value.toString())
         repository.saveAlarms(_alarms.value)
     }
 

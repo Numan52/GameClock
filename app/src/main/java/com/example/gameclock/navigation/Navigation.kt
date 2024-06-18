@@ -15,7 +15,7 @@ import com.example.gameclock.ViewModels.AlarmViewModelFactory
 import com.example.gameclock.helper.AlarmManagerHelper
 import com.example.gameclock.screens.AlarmDetailsScreen
 import com.example.gameclock.screens.HomeScreen
-import com.example.gameclock.screens.PuzzleScreen
+
 import com.example.gameclock.screens.PuzzleSelectionScreen
 import com.example.gameclock.screens.RingtoneSelectionScreen
 
@@ -74,25 +74,25 @@ fun Navigation(context: Context) {
             )
         }
 
-        composable(
-            route = Screen.PuzzleScreen.route,
-            arguments = listOf(navArgument(name = DETAIL_ARGUMENT_KEY) { type = NavType.StringType })
-        ) { backStackEntry ->
-            val alarmId = backStackEntry.arguments?.getString(DETAIL_ARGUMENT_KEY) ?: return@composable
-
-            PuzzleScreen(
-                alarmId = alarmId,
-                onPuzzleSolved = {
-                    // Define what happens when the puzzle is solved
-                    alarmViewModel.removeAlarmById(alarmId)
-                    navController.navigate(Screen.HomeScreen.route)
-                },
-                onEmergencyStop = {
-                    // Define what happens when the emergency stop is pressed
-                    alarmViewModel.removeAlarmById(alarmId)
-                    navController.navigate(Screen.HomeScreen.route)
-                }
-            )
-        }
+//        composable(
+//            route = Screen.PuzzleScreen.route,
+//            arguments = listOf(navArgument(name = DETAIL_ARGUMENT_KEY) { type = NavType.StringType })
+//        ) { backStackEntry ->
+//            val alarmId = backStackEntry.arguments?.getString(DETAIL_ARGUMENT_KEY) ?: return@composable
+//
+//            PuzzleScreen(
+//                alarmId = alarmId,
+//                onPuzzleSolved = {
+//                    // Define what happens when the puzzle is solved
+//                    alarmViewModel.removeAlarmById(alarmId)
+//                    navController.navigate(Screen.HomeScreen.route)
+//                },
+//                onEmergencyStop = {
+//                    // Define what happens when the emergency stop is pressed
+//                    alarmViewModel.removeAlarmById(alarmId)
+//                    navController.navigate(Screen.HomeScreen.route)
+//                }
+//            )
+//        }
     }
 }
