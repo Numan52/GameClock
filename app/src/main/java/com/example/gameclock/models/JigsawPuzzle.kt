@@ -47,7 +47,7 @@ class JigsawPuzzle(
 
             var piecesPlaced by remember { mutableStateOf(0) }
             val totalPieces = 4 // For a simple 2x2 puzzle
-            val alarmViewModel: AlarmViewModel = viewModel()
+
 
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -75,7 +75,6 @@ class JigsawPuzzle(
 
                     // Emergency stop button
                     Button(onClick = {
-                        alarmViewModel.removeAlarmById(alarmId)
                         onEmergencyStop()
                     }) {
                         androidx.compose.material3.Text(text = "Emergency Stop")
@@ -86,7 +85,6 @@ class JigsawPuzzle(
             // Check if the puzzle is solved
             LaunchedEffect(piecesPlaced) {
                 if (piecesPlaced == totalPieces) {
-                    alarmViewModel.removeAlarmById(alarmId)
                     onPuzzleSolved()
                 }
             }

@@ -12,6 +12,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
 import androidx.core.content.ContextCompat
+import com.example.gameclock.models.PreviewMemoryPuzzle
 
 class MainActivity : ComponentActivity() {
     private val permissions = listOf(

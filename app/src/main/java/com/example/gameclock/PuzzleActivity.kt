@@ -30,8 +30,10 @@ class PuzzleActivity : ComponentActivity() {
                             // Stop the MediaPlayer when the puzzle is solved
                             MediaPlayerHelper.stop()
                             // Remove the alarm from the view model
-                            alarmId?.let {
-                                alarmViewModel.removeAlarmById(it)
+                            if (alarm.recurringDays.isEmpty()) {
+                                alarmId?.let {
+                                    alarmViewModel.removeAlarmById(it)
+                                }
                             }
                             finish()
                         },
@@ -39,9 +41,11 @@ class PuzzleActivity : ComponentActivity() {
                             // Stop the MediaPlayer when emergency stop is pressed
                             MediaPlayerHelper.stop()
                             // Remove the alarm from the view model
-                            //                        alarmId?.let {
-                            //                            alarmViewModel.removeAlarmById(it)
-                            //                        }
+                            if (alarm.recurringDays.isEmpty()) {
+                                alarmId?.let {
+                                    alarmViewModel.removeAlarmById(it)
+                                }
+                            }
                             finish()
                         }
                     )
