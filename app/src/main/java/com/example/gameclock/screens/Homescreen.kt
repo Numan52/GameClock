@@ -3,22 +3,33 @@ package com.example.gameclock.screens
 import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+
 import com.example.gameclock.ViewModels.AlarmViewModel
 import com.example.gameclock.helper.AlarmManagerHelper
 import com.example.gameclock.models.Alarm
 import com.example.gameclock.navigation.Screen
 import com.example.gameclock.widgets.TopAppBar
+
+import androidx.compose.material.*
+import com.example.gameclock.ui.theme.CustomBlack
+import com.example.gameclock.ui.theme.CustomGray
+import com.example.gameclock.ui.theme.CustomWhite
+
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -31,40 +42,47 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar("My Alarms")
+            TopAppBar(
+                title = { Text("My Alarms") },
+                backgroundColor = CustomBlack,
+                contentColor = CustomWhite
+            )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    val newAlarmId = java.util.UUID.randomUUID().toString()
+                    navController.navigate(route = Screen.AlarmDetailsScreen.withId(newAlarmId))
+                },
+                backgroundColor = Color.Black
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add Alarm", tint = Color.White)
+            }
         }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
-                .padding(top = 30.dp),
+                .padding(horizontal = 16.dp)
         ) {
             if (alarms.value.isEmpty()) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "You don't have any alarms", fontSize = 32.sp)
+                    Text(
+                        text = "You don't have any alarms",
+                        fontSize = 20.sp,
+                        color = CustomGray
+                    )
                 }
             } else {
-                AlarmsList(navController = navController, alarms = alarms.value, alarmViewModel = alarmViewModel, alarmManagerHelper = alarmManagerHelper)
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 50.dp, end = 10.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "add alarm",
-                    modifier = Modifier
-                        .clickable {
-                            // Generate a unique ID for the new alarm
-                            val newAlarmId = java.util.UUID.randomUUID().toString()
-                            navController.navigate(route = Screen.AlarmDetailsScreen.withId(newAlarmId))
-                        }
-                        .size(40.dp)
+                AlarmsList(
+                    navController = navController,
+                    alarms = alarms.value,
+                    alarmViewModel = alarmViewModel,
+                    alarmManagerHelper = alarmManagerHelper
                 )
             }
         }
@@ -72,48 +90,62 @@ fun HomeScreen(
 }
 
 @Composable
-fun AlarmsList(navController: NavHostController, alarms: List<Alarm>, alarmViewModel: AlarmViewModel, alarmManagerHelper: AlarmManagerHelper) {
-    Column {
-        alarms.forEach { alarm ->
-            AlarmItem(navController = navController, alarm = alarm, alarmViewModel = alarmViewModel, alarmManagerHelper = alarmManagerHelper)
+fun AlarmsList(
+    navController: NavHostController,
+    alarms: List<Alarm>,
+    alarmViewModel: AlarmViewModel,
+    alarmManagerHelper: AlarmManagerHelper
+) {
+    LazyColumn {
+        items(alarms) { alarm ->
+            AlarmItem(
+                navController = navController,
+                alarm = alarm,
+                alarmViewModel = alarmViewModel,
+                alarmManagerHelper = alarmManagerHelper
+            )
         }
     }
 }
 
 @Composable
-fun AlarmItem(navController: NavHostController, alarm: Alarm, alarmViewModel: AlarmViewModel, alarmManagerHelper: AlarmManagerHelper) {
+fun AlarmItem(
+    navController: NavHostController,
+    alarm: Alarm,
+    alarmViewModel: AlarmViewModel,
+    alarmManagerHelper: AlarmManagerHelper
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-//            .clickable {
-//                navController.navigate(route = Screen.AlarmDetailsScreen.withId(alarm.id))
-//            }
-            .padding(16.dp),
+            .padding(vertical = 16.dp)
+            .clickable {
+                navController.navigate(route = Screen.AlarmDetailsScreen.withId(alarm.id))
+            },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column {
-            val formattedHour = if (alarm.hour < 10) "0${alarm.hour}" else "${alarm.hour}"
-            val formattedMinute = if (alarm.minute < 10) "0${alarm.minute}" else "${alarm.minute}"
+            val formattedHour = String.format("%02d", alarm.hour)
+            val formattedMinute = String.format("%02d", alarm.minute)
 
-            Text(text = "${formattedHour}:${formattedMinute}", fontSize = 24.sp)
+            Text(text = "$formattedHour:$formattedMinute", fontSize = 24.sp, fontWeight = FontWeight.Bold)
             if (alarm.date != null) {
-                Text(text = alarm.date.toString(), fontSize = 18.sp)
+                Text(text = alarm.date.toString(), fontSize = 14.sp, color = Color.Gray)
             } else if (alarm.recurringDays.isNotEmpty()) {
-                var days = ""
-                if (alarm.recurringDays.size == 7) {
-                    days = "Daily"
+                val days = if (alarm.recurringDays.size == 7) {
+                    "Daily"
                 } else {
-                    days = "Every " + alarm.recurringDays.joinToString(", ")
+                    "Every " + alarm.recurringDays.joinToString(", ")
                 }
-                Text(text = days, fontSize = 18.sp)
+                Text(text = days, fontSize = 14.sp, color = Color.Gray)
             }
         }
         IconButton(onClick = {
             alarmViewModel.removeAlarm(alarm)
             alarmManagerHelper.cancelAlarm(alarm, setOf())
         }) {
-            Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Alarm")
+            Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Alarm", tint = Color.Red)
         }
     }
 }
