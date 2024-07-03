@@ -2,36 +2,20 @@ package com.example.gameclock.models
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
 import androidx.compose.material3.Button
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.unit.sp
 import com.example.gameclock.R
-import com.example.gameclock.ViewModels.AlarmViewModel
-
 
 class JigsawPuzzle(
     override val id: Int = 3,
@@ -40,87 +24,93 @@ class JigsawPuzzle(
     override val description: String = "Rearrange the pieces of an image to reconstruct the original image.",
     override val puzzleType: PuzzleType = PuzzleType.PATTERN_RECOGNITION
 ) : Puzzle {
+
     @Composable
-    override fun DisplayPuzzle(alarmId: String,
-                               onPuzzleSolved: () -> Unit,
-                               onEmergencyStop: () -> Unit) {
+    override fun DisplayPuzzle(
+        alarmId: String,
+        onPuzzleSolved: () -> Unit,
+        onEmergencyStop: () -> Unit
+    ) {
+        val imagePieces = generateImagePieces()
+        var shuffledPieces by remember { mutableStateOf(imagePieces.shuffled()) }
+        var selectedPiece by remember { mutableStateOf<Int?>(null) }
+        var attempts by remember { mutableStateOf(0) }
 
-            var piecesPlaced by remember { mutableStateOf(0) }
-            val totalPieces = 4 // For a simple 2x2 puzzle
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = "Jigsaw Puzzle", fontSize = 24.sp, color = Color.Black)
+            Spacer(modifier = Modifier.height(16.dp))
 
-
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    androidx.compose.material3.Text(text = "Solve the puzzle to stop the alarm", color = Color.White, modifier = Modifier.padding(16.dp))
-
-                    Box(
-                        modifier = Modifier
-                            .size(300.dp)
-                            .background(Color.Gray, shape = RoundedCornerShape(8.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column {
-                            Row {
-                                PuzzlePiece(R.drawable.image_piece_2, onPiecePlaced = { piecesPlaced++ })
-                                PuzzlePiece(R.drawable.image_piece_4, onPiecePlaced = { piecesPlaced++ })
-                            }
-                            Row {
-                                PuzzlePiece(R.drawable.image_piece_1, onPiecePlaced = { piecesPlaced++ })
-                                PuzzlePiece(R.drawable.image_piece_3, onPiecePlaced = { piecesPlaced++ })
-                            }
+            JigsawBoard(
+                pieces = shuffledPieces,
+                onPieceClick = { index ->
+                    if (selectedPiece == null) {
+                        selectedPiece = index
+                    } else {
+                        shuffledPieces = shuffledPieces.swap(selectedPiece!!, index)
+                        selectedPiece = null
+                        attempts++
+                        if (shuffledPieces == imagePieces) {
+                            onPuzzleSolved()
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Emergency stop button
-                    Button(onClick = {
-                        onEmergencyStop()
-                    }) {
-                        androidx.compose.material3.Text(text = "Emergency Stop")
-                    }
                 }
-            }
+            )
 
-            // Check if the puzzle is solved
-            LaunchedEffect(piecesPlaced) {
-                if (piecesPlaced == totalPieces) {
-                    onPuzzleSolved()
-                }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(onClick = onEmergencyStop) {
+                Text(text = "Emergency Stop")
             }
         }
+    }
+
+    private fun List<Painter>.swap(index1: Int, index2: Int): List<Painter> {
+        return toMutableList().apply {
+            val temp = this[index1]
+            this[index1] = this[index2]
+            this[index2] = temp
+        }
+    }
 
     @Composable
-    fun PuzzlePiece(
-        imageResId: Int,
-        modifier: Modifier = Modifier,
-        onPiecePlaced: () -> Unit
+    private fun JigsawBoard(
+        pieces: List<Painter>,
+        onPieceClick: (Int) -> Unit
     ) {
-        var offsetX by remember { mutableStateOf(0f) }
-        var offsetY by remember { mutableStateOf(0f) }
-
-        Box(
-            modifier = modifier
-                .size(150.dp)
-                .graphicsLayer(
-                    translationX = offsetX,
-                    translationY = offsetY
-                )
-                .pointerInput(Unit) {
-                    detectDragGestures { change, dragAmount ->
-                        change.consume()
-                        offsetX += dragAmount.x
-                        offsetY += dragAmount.y
+        Column {
+            for (i in 0..1) {
+                Row {
+                    for (j in 0..1) {
+                        val index = i * 2 + j
+                        Box(
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .size(150.dp)
+                                .background(Color.Gray, RoundedCornerShape(8.dp))
+                                .clickable { onPieceClick(index) },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(painter = pieces[index], contentDescription = null)
+                        }
                     }
                 }
-                .background(Color.Gray, shape = RoundedCornerShape(8.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = imageResId),
-                contentDescription = null,
-                contentScale = ContentScale.Crop
-            )
+            }
         }
+    }
+
+    @Composable
+    private fun generateImagePieces(): List<Painter> {
+        return listOf(
+            painterResource(id = R.drawable.image_piece_1),
+            painterResource(id = R.drawable.image_piece_2),
+            painterResource(id = R.drawable.image_piece_3),
+            painterResource(id = R.drawable.image_piece_4)
+        )
     }
 }

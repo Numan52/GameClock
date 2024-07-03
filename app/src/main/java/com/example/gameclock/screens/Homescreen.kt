@@ -25,10 +25,6 @@ import com.example.gameclock.models.Alarm
 import com.example.gameclock.navigation.Screen
 import com.example.gameclock.widgets.TopAppBar
 
-import androidx.compose.material.*
-import com.example.gameclock.ui.theme.CustomBlack
-import com.example.gameclock.ui.theme.CustomGray
-import com.example.gameclock.ui.theme.CustomWhite
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -44,8 +40,8 @@ fun HomeScreen(
         topBar = {
             TopAppBar(
                 title = { Text("My Alarms") },
-                backgroundColor = CustomBlack,
-                contentColor = CustomWhite
+                backgroundColor = Color.Black,
+                contentColor = Color.White
             )
         },
         floatingActionButton = {
@@ -74,7 +70,7 @@ fun HomeScreen(
                     Text(
                         text = "You don't have any alarms",
                         fontSize = 20.sp,
-                        color = CustomGray
+                        color = Color.Gray
                     )
                 }
             } else {
