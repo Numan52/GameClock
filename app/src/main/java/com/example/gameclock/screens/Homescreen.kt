@@ -1,6 +1,7 @@
 package com.example.gameclock.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -101,6 +102,8 @@ fun AlarmsList(
                 alarmManagerHelper = alarmManagerHelper
             )
         }
+
+        Log.i("alarms", alarms.toString())
     }
 }
 
@@ -111,6 +114,7 @@ fun AlarmItem(
     alarmViewModel: AlarmViewModel,
     alarmManagerHelper: AlarmManagerHelper
 ) {
+    Log.i("alarmDate", alarm.date.toString())
     Row(
         modifier = Modifier
             .fillMaxWidth()

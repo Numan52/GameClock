@@ -97,7 +97,7 @@ fun SetAlarmScreen(
                         date = if (selectedDays.isEmpty()) selectedDate else null,
                         recurringDays = selectedDays,
                         ringtone = selectedRingtone ?: "alarm1",
-                        puzzle = selectedPuzzle ?: JigsawPuzzle() // TODO: why is puzzle null after saving??
+                        puzzle = selectedPuzzle ?: JigsawPuzzle()
                     )
                     Log.i("my-alarm", alarm.toString())
                     alarmViewModel.addAlarm(alarm)
