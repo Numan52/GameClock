@@ -1,9 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.SET_ALARM" />
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:allowBackup="true"
@@ -14,7 +15,7 @@
         android:theme="@style/Theme.GameClock"
         tools:targetApi="31">
 
-        <receiver android:name=".AlarmReceiver" android:exported="true"/>
+        <receiver android:name=".AlarmReceiver" android:enabled="true" android:exported="true"/>
 
         <activity
             android:name=".MainActivity"
@@ -28,5 +29,11 @@
         </activity>
 
         <activity android:name=".PuzzleActivity" android:exported="true" />
+
+        <service
+            android:name=".helper.AlarmForegroundService"
+            android:exported="false"
+            android:permission="android.permission.FOREGROUND_SERVICE"
+        />
     </application>
 </manifest>

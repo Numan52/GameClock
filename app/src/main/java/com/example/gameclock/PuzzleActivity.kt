@@ -1,6 +1,7 @@
 package com.example.gameclock
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.collectAsState
@@ -19,7 +20,7 @@ class PuzzleActivity : ComponentActivity() {
         alarmId = intent.getStringExtra("alarmId")
         alarmViewModel = ViewModelProvider(this)[AlarmViewModel::class.java]
         val alarm: Alarm? =  alarmViewModel.alarms.value.find { alarm -> alarmId == alarm.id }
-
+        Log.i("PuzzleActivity", alarm.toString())
 
         setContent {
             GameClockTheme {

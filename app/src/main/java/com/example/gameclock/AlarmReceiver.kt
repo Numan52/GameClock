@@ -1,12 +1,16 @@
 package com.example.gameclock
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.Log
+import com.example.gameclock.helper.AlarmForegroundService
 import com.example.gameclock.helper.MediaPlayerHelper
 
 class AlarmReceiver : BroadcastReceiver() {
+    @SuppressLint("DiscouragedApi", "ObsoleteSdkInt")
     override fun onReceive(context: Context, intent: Intent) {
         val alarmId = intent.getStringExtra("alarmId")
         val ringtone = intent.getStringExtra("ringtone")
@@ -20,12 +24,16 @@ class AlarmReceiver : BroadcastReceiver() {
                 if (resId != 0) {
                     MediaPlayerHelper.start(context, resId)
 
-                    // Start the PuzzleActivity
-                    val puzzleIntent = Intent(context, PuzzleActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    // Start the ForegroundService to launch the PuzzleActivity
+                    val serviceIntent = Intent(context, AlarmForegroundService::class.java).apply {
                         putExtra("alarmId", alarmId)
                     }
-                    context.startActivity(puzzleIntent)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        context.startForegroundService(serviceIntent)
+                    } else {
+                        context.startService(serviceIntent)
+                    }
+                    Log.d("AlarmReceiver", "ForegroundService started to launch PuzzleActivity")
                 } else {
                     Log.e("AlarmReceiver", "Ringtone resource not found.")
                 }
