@@ -1,21 +1,27 @@
 package com.example.gameclock.models
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gameclock.R
 import kotlin.random.Random
+
+
 
 class MathPuzzle(
     override val id: Int = 2,
@@ -29,7 +35,8 @@ class MathPuzzle(
     override fun DisplayPuzzle(
         alarmId: String,
         onPuzzleSolved: () -> Unit,
-        onEmergencyStop: () -> Unit
+        onEmergencyStop: () -> Unit,
+        showEmergencyButton: Boolean
     ) {
         val viewModel: MathPuzzleViewModel = viewModel()
         val (num1, num2) = remember { viewModel.generateRandomNumbers() } // Remember the generated numbers
@@ -38,7 +45,13 @@ class MathPuzzle(
         val (userAnswer, setUserAnswer) = remember { mutableStateOf("") }
         val (feedback, setFeedback) = remember { mutableStateOf("") }
 
-        Column {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
             Text(text = "Solve the following problem:")
             Text(text = "$num1 + $num2 = ?")
 
@@ -71,8 +84,10 @@ class MathPuzzle(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(onClick = onEmergencyStop) {
-                Text(text = "Emergency Stop")
+            if (showEmergencyButton) {
+                Button(onClick = onEmergencyStop) {
+                    Text(text = "Emergency Stop")
+                }
             }
         }
     }
@@ -83,5 +98,3 @@ class MathPuzzleViewModel : ViewModel() {
         return Random.nextInt(1, 100) to Random.nextInt(1, 100)
     }
 }
-
-

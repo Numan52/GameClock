@@ -5,11 +5,15 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModelProvider
 import com.example.gameclock.ui.theme.GameClockTheme
 import com.example.gameclock.ViewModels.AlarmViewModel
 import com.example.gameclock.helper.MediaPlayerHelper
 import com.example.gameclock.models.Alarm
+import kotlinx.coroutines.delay
+
+
 
 class PuzzleActivity : ComponentActivity() {
     private lateinit var alarmViewModel: AlarmViewModel
@@ -19,12 +23,19 @@ class PuzzleActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         alarmId = intent.getStringExtra("alarmId")
         alarmViewModel = ViewModelProvider(this)[AlarmViewModel::class.java]
-        val alarm: Alarm? =  alarmViewModel.alarms.value.find { alarm -> alarmId == alarm.id }
+        val alarm: Alarm? = alarmViewModel.alarms.value.find { alarm -> alarmId == alarm.id }
         Log.i("PuzzleActivity", alarm.toString())
 
         setContent {
             GameClockTheme {
                 if (alarm != null) {
+                    var showEmergencyButton by remember { mutableStateOf(false) }
+
+                    LaunchedEffect(Unit) {
+                        delay(10000)
+                        showEmergencyButton = true
+                    }
+
                     alarm.puzzle?.DisplayPuzzle(
                         alarmId = alarmId ?: "",
                         onPuzzleSolved = {
@@ -48,7 +59,8 @@ class PuzzleActivity : ComponentActivity() {
                                 }
                             }
                             finish()
-                        }
+                        },
+                        showEmergencyButton = showEmergencyButton
                     )
                 }
             }

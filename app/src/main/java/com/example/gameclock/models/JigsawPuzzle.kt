@@ -29,7 +29,8 @@ class JigsawPuzzle(
     override fun DisplayPuzzle(
         alarmId: String,
         onPuzzleSolved: () -> Unit,
-        onEmergencyStop: () -> Unit
+        onEmergencyStop: () -> Unit,
+        showEmergencyButton: Boolean
     ) {
         val imagePieces = generateImagePieces()
         var shuffledPieces by remember { mutableStateOf(imagePieces.shuffled()) }
@@ -64,8 +65,10 @@ class JigsawPuzzle(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(onClick = onEmergencyStop) {
-                Text(text = "Emergency Stop")
+            if (showEmergencyButton) {
+                Button(onClick = onEmergencyStop) {
+                    Text(text = "Emergency Stop")
+                }
             }
         }
     }

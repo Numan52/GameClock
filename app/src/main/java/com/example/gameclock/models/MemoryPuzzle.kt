@@ -60,7 +60,8 @@ class MemoryPuzzle(
     override fun DisplayPuzzle(
         alarmId: String,
         onPuzzleSolved: () -> Unit,
-        onEmergencyStop: () -> Unit
+        onEmergencyStop: () -> Unit,
+        showEmergencyButton: Boolean
     ) {
         var gameState by remember { mutableStateOf(cards) }
         var selectedCards by remember { mutableStateOf<List<Card>>(emptyList()) }
@@ -104,17 +105,19 @@ class MemoryPuzzle(
                         card,
                         selectedCards,
                         gameState,
-                        { selectedCard -> selectedCards += selectedCard}
+                        { selectedCard -> selectedCards += selectedCard }
                     )
                 }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            androidx.compose.material3.Button(onClick = {
-                onEmergencyStop()
-            }) {
-                androidx.compose.material3.Text(text = "Emergency Stop")
+            if (showEmergencyButton) {
+                androidx.compose.material3.Button(onClick = {
+                    onEmergencyStop()
+                }) {
+                    androidx.compose.material3.Text(text = "Emergency Stop")
+                }
             }
         }
     }
@@ -175,8 +178,7 @@ fun PreviewMemoryPuzzle() {
     MemoryPuzzle().DisplayPuzzle(
         alarmId = "test_alarm",
         onPuzzleSolved = { Log.i("win", "you won") },
-        onEmergencyStop = { /* Handle emergency stop */ }
+        onEmergencyStop = { /* Handle emergency stop */ },
+        showEmergencyButton = true
     )
 }
-
-

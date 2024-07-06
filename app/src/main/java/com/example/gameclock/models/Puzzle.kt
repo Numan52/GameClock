@@ -11,9 +11,11 @@ interface Puzzle {
     val puzzleType: PuzzleType
 
     @Composable
-    fun DisplayPuzzle(alarmId: String,
-                      onPuzzleSolved: () -> Unit,
-                      onEmergencyStop: () -> Unit
+    fun DisplayPuzzle(
+        alarmId: String,
+        onPuzzleSolved: () -> Unit,
+        onEmergencyStop: () -> Unit,
+        showEmergencyButton: Boolean
     )
 }
 
