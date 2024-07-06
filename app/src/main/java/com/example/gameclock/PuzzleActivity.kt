@@ -1,5 +1,8 @@
 package com.example.gameclock
 
+import android.app.NotificationManager
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -9,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModelProvider
 import com.example.gameclock.ui.theme.GameClockTheme
 import com.example.gameclock.ViewModels.AlarmViewModel
+import com.example.gameclock.helper.AlarmForegroundService
 import com.example.gameclock.helper.MediaPlayerHelper
 import com.example.gameclock.models.Alarm
 import kotlinx.coroutines.delay
@@ -18,7 +22,7 @@ import kotlinx.coroutines.delay
 class PuzzleActivity : ComponentActivity() {
     private lateinit var alarmViewModel: AlarmViewModel
     private var alarmId: String? = null
-
+    private val notificationId = 1 //  matches the notification ID used in AlarmForegroundService
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         alarmId = intent.getStringExtra("alarmId")
@@ -47,9 +51,13 @@ class PuzzleActivity : ComponentActivity() {
                                     alarmViewModel.removeAlarmById(it)
                                 }
                             }
+                            stopAlarmForegroundService()
+                            cancelNotification()
+
                             finish()
                         },
                         onEmergencyStop = {
+
                             // Stop the MediaPlayer when emergency stop is pressed
                             MediaPlayerHelper.stop()
                             // Remove the alarm from the view model
@@ -58,6 +66,9 @@ class PuzzleActivity : ComponentActivity() {
                                     alarmViewModel.removeAlarmById(it)
                                 }
                             }
+                            stopAlarmForegroundService()
+                            cancelNotification()
+
                             finish()
                         },
                         showEmergencyButton = showEmergencyButton
@@ -65,5 +76,17 @@ class PuzzleActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun cancelNotification() {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(notificationId)
+        Log.i("PuzzleActivity", "Notification cancelled")
+    }
+
+    private fun stopAlarmForegroundService() {
+        val intent = Intent(this, AlarmForegroundService::class.java)
+        stopService(intent)
+        Log.i("PuzzleActivity", "AlarmForegroundService stopped")
     }
 }
