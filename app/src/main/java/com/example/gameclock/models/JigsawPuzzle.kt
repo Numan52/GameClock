@@ -33,7 +33,7 @@ class JigsawPuzzle(
         showEmergencyButton: Boolean
     ) {
         val imagePieces = generateImagePieces()
-        var shuffledPieces by remember { mutableStateOf(imagePieces.shuffled()) }
+        var shuffledPieces by remember { mutableStateOf(shufflePieces(imagePieces)) }
         var selectedPiece by remember { mutableStateOf<Int?>(null) }
         var attempts by remember { mutableStateOf(0) }
 
@@ -115,5 +115,13 @@ class JigsawPuzzle(
             painterResource(id = R.drawable.image_piece_3),
             painterResource(id = R.drawable.image_piece_4)
         )
+    }
+
+    private fun shufflePieces(pieces: List<Painter>): List<Painter> {
+        var shuffled: List<Painter>
+        do {
+            shuffled = pieces.shuffled()
+        } while (shuffled == pieces)
+        return shuffled
     }
 }
