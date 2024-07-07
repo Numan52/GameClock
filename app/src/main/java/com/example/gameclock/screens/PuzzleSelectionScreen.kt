@@ -35,12 +35,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.gameclock.R
 import com.example.gameclock.ViewModels.AlarmViewModel
 import com.example.gameclock.models.Puzzle
 import com.example.gameclock.models.PuzzleType
 import com.example.gameclock.models.getPuzzleOptions
+import com.example.gameclock.navigation.Screen
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -98,7 +100,8 @@ fun PuzzleSelectionScreen(
                 PuzzleItem(
                     puzzle = puzzle,
                     selectedPuzzleId = selectedPuzzle?.id,
-                    onPuzzleSelection = { alarmViewModel.setPuzzle(puzzle) }
+                    onPuzzleSelection = { alarmViewModel.setPuzzle(puzzle) },
+                    navController = navController
                 )
             }
         }
@@ -110,7 +113,8 @@ fun PuzzleSelectionScreen(
 fun PuzzleItem(
     puzzle: Puzzle,
     selectedPuzzleId: Int?,
-    onPuzzleSelection: (Int) -> Unit
+    onPuzzleSelection: (Int) -> Unit,
+    navController: NavHostController
 ) {
     Row (
         Modifier
@@ -139,7 +143,7 @@ fun PuzzleItem(
                     backgroundColor = Color(0xff0d0c0b),
                 ),
                 onClick = {
-
+                    navController.navigate(Screen.PuzzlePreviewScreen.withId(puzzle.id.toString()))
                 }
             ) {
                 Text(

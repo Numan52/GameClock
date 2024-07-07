@@ -15,6 +15,7 @@ import com.example.gameclock.ViewModels.AlarmViewModelFactory
 import com.example.gameclock.helper.AlarmManagerHelper
 import com.example.gameclock.screens.AlarmDetailsScreen
 import com.example.gameclock.screens.HomeScreen
+import com.example.gameclock.screens.PuzzlePreviewScreen
 
 import com.example.gameclock.screens.PuzzleSelectionScreen
 import com.example.gameclock.screens.RingtoneSelectionScreen
@@ -72,6 +73,19 @@ fun Navigation(context: Context) {
                 alarmViewModel = alarmViewModel,
                 context = context.applicationContext
             )
+        }
+
+        composable(
+            route = Screen.PuzzlePreviewScreen.route,
+            arguments = listOf(navArgument(name = PUZZLE_ID) { type = NavType.StringType })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString(PUZZLE_ID)?.let {
+                PuzzlePreviewScreen(
+                    navController = navController,
+                    puzzleId = it,
+                    context = context.applicationContext
+                )
+            }
         }
 
 //        composable(
