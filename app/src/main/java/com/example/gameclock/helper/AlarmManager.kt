@@ -64,7 +64,6 @@ class AlarmManagerHelper(private val context: Context) {
     fun cancelAlarm(alarm: Alarm, selectedDays: Set<String>) {
         val intent = Intent(context, AlarmReceiver::class.java)
 
-        // TODO: canceling recurrent alarm
 
         if (selectedDays.isNotEmpty()) {
             val daysOfWeekOrder = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
