@@ -61,18 +61,4 @@ fun SaveCancelButton(text: String, onClick: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopAppBar(
-    title: String,
-    navigationIcons: @Composable () -> Unit = {},
-) {
-    CenterAlignedTopAppBar(
-        title = { Text(title) },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Black,
-            titleContentColor = Color.White
-        ),
-        navigationIcon = navigationIcons
-    )
-}
+

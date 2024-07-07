@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModelProvider
 import com.example.gameclock.ui.theme.GameClockTheme

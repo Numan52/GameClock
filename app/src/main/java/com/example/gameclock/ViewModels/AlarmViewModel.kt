@@ -10,10 +10,11 @@ import com.example.gameclock.models.Puzzle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDate
-import java.util.Date
 
+// ViewModel to manage alarm-related data
 class AlarmViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository = AlarmRepository(application)
+    private val repository = AlarmRepository(application) // Repository for data operations
+
     private val _alarms = MutableStateFlow<List<Alarm>>(emptyList())
     val alarms: StateFlow<List<Alarm>> get() = _alarms
 
@@ -32,10 +33,11 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
     private val _selectedDays = MutableStateFlow((setOf<String>()))
     val selectedDays : StateFlow<Set<String>> get() = _selectedDays
 
-    private val _selectedPuzzle: MutableStateFlow<Puzzle> = MutableStateFlow(JigsawPuzzle())
-    val selectedPuzzle : StateFlow<Puzzle?> get() = _selectedPuzzle
+    private val _selectedPuzzle: MutableStateFlow<Puzzle> = MutableStateFlow(JigsawPuzzle()) // it holds the currently selected puzzle
+    val selectedPuzzle : StateFlow<Puzzle?> get() = _selectedPuzzle // Public state flow for observing the selected puzzle
 
 
+    // loading alarms from repository
     init {
         _alarms.value = repository.loadAlarms()
     }

@@ -10,12 +10,12 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import com.google.gson.JsonParseException
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import java.lang.reflect.Type
 
 class PuzzleDeserializer : JsonDeserializer<Puzzle>, JsonSerializer<Puzzle> {
+    // Convert JSON to a Puzzle object
     override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Puzzle {
         val jsonObject = json.asJsonObject
         Log.i("puzzle_deserializer", jsonObject.toString())
@@ -32,9 +32,12 @@ class PuzzleDeserializer : JsonDeserializer<Puzzle>, JsonSerializer<Puzzle> {
         }
     }
 
+    // Convert a Puzzle object to JSON
     override fun serialize(src: Puzzle?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
         val jsonObject = JsonObject()
         Log.i("jsonObject", jsonObject.toString())
+
+        // Add common properties of Puzzle to JSON
         jsonObject.addProperty("id", src?.id.toString())
         jsonObject.addProperty("name", src?.name.toString())
         jsonObject.addProperty("description", src?.description.toString())

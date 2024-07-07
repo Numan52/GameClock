@@ -18,9 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.gameclock.R
 import com.example.gameclock.ViewModels.AlarmViewModel
-import com.example.gameclock.navigation.Screen
 
 val ringtoneList = listOf(
     "alarm1",

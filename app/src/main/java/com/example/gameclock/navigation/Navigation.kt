@@ -38,6 +38,7 @@ fun Navigation(context: Context) {
             )
         }
 
+        // Alarm details screen route
         composable(
             route = Screen.AlarmDetailsScreen.route,
             arguments = listOf(navArgument(name = DETAIL_ARGUMENT_KEY) { type = NavType.StringType })
@@ -51,6 +52,7 @@ fun Navigation(context: Context) {
             )
         }
 
+        // Ringtone selection screen route
         composable(
             route = Screen.RingtoneScreen.route,
             arguments = listOf(navArgument(name = DETAIL_ARGUMENT_KEY) { type = NavType.StringType })
@@ -63,6 +65,7 @@ fun Navigation(context: Context) {
             )
         }
 
+        // Puzzle selection screen route
         composable(
             route = Screen.PuzzleSelectionScreen.route,
             arguments = listOf(navArgument(name = DETAIL_ARGUMENT_KEY) { type = NavType.StringType })
@@ -75,6 +78,7 @@ fun Navigation(context: Context) {
             )
         }
 
+        // Puzzle preview screen route
         composable(
             route = Screen.PuzzlePreviewScreen.route,
             arguments = listOf(navArgument(name = PUZZLE_ID) { type = NavType.StringType })
@@ -88,25 +92,5 @@ fun Navigation(context: Context) {
             }
         }
 
-//        composable(
-//            route = Screen.PuzzleScreen.route,
-//            arguments = listOf(navArgument(name = DETAIL_ARGUMENT_KEY) { type = NavType.StringType })
-//        ) { backStackEntry ->
-//            val alarmId = backStackEntry.arguments?.getString(DETAIL_ARGUMENT_KEY) ?: return@composable
-//
-//            PuzzleScreen(
-//                alarmId = alarmId,
-//                onPuzzleSolved = {
-//                    // Define what happens when the puzzle is solved
-//                    alarmViewModel.removeAlarmById(alarmId)
-//                    navController.navigate(Screen.HomeScreen.route)
-//                },
-//                onEmergencyStop = {
-//                    // Define what happens when the emergency stop is pressed
-//                    alarmViewModel.removeAlarmById(alarmId)
-//                    navController.navigate(Screen.HomeScreen.route)
-//                }
-//            )
-//        }
     }
 }

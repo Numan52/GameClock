@@ -3,12 +3,14 @@ package com.example.gameclock.models
 import androidx.compose.runtime.Composable
 import com.example.gameclock.R
 
+// Interface defining a puzzle
 interface Puzzle {
     val id: Int
     val icon: Int
     val name: String
     val description: String
     val puzzleType: PuzzleType
+
 
     @Composable
     fun DisplayPuzzle(
@@ -18,6 +20,7 @@ interface Puzzle {
         showEmergencyButton: Boolean
     )
 }
+
 
 fun getPuzzleOptions() : List<Puzzle> {
     return listOf(
