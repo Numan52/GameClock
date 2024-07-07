@@ -76,7 +76,6 @@ fun HomeScreen(
                 }
             } else {
                 AlarmsList(
-                    navController = navController,
                     alarms = alarms.value,
                     alarmViewModel = alarmViewModel,
                     alarmManagerHelper = alarmManagerHelper
@@ -88,7 +87,6 @@ fun HomeScreen(
 
 @Composable
 fun AlarmsList(
-    navController: NavHostController,
     alarms: List<Alarm>,
     alarmViewModel: AlarmViewModel,
     alarmManagerHelper: AlarmManagerHelper
@@ -96,7 +94,6 @@ fun AlarmsList(
     LazyColumn {
         items(alarms) { alarm ->
             AlarmItem(
-                navController = navController,
                 alarm = alarm,
                 alarmViewModel = alarmViewModel,
                 alarmManagerHelper = alarmManagerHelper
@@ -109,7 +106,6 @@ fun AlarmsList(
 
 @Composable
 fun AlarmItem(
-    navController: NavHostController,
     alarm: Alarm,
     alarmViewModel: AlarmViewModel,
     alarmManagerHelper: AlarmManagerHelper
@@ -118,10 +114,7 @@ fun AlarmItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp)
-            .clickable {
-                navController.navigate(route = Screen.AlarmDetailsScreen.withId(alarm.id))
-            },
+            .padding(vertical = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
